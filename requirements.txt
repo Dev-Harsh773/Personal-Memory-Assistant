@@ -1,0 +1,17 @@
+torch
+torchvision
+transformers
+chromadb
+Pillow
+sentencepiece
+fastapi
+uvicorn
+python-multipart
+jinja2
+sentence-transformers
+PyMuPDF
+python-docx
+python-pptx
+watchdog
+pystray
+PyQt5

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f8fafc;
+            --text2: #94a3b8;
+            --accent: #3b82f6;
+            --accent2: #2563eb;
+            --border: #334155;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+        }
+        header {
+            text-align: center;
+            margin: 1.5rem 0 2rem;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.3rem;
+        }
+        .subtitle { color: var(--text2); font-size: 0.95rem; }
+
+        /* Search Bar */
+        .search-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            transition: border-color 0.2s;
+        }
+        .search-bar:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+        }
+        .search-bar input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 1.05rem;
+            outline: none;
+            font-family: inherit;
+        }
+        .search-bar input::placeholder { color: var(--text2); }
+        .search-bar button {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.55rem 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .search-bar button:hover { background: var(--accent2); }
+        .search-bar button:disabled { background: var(--border); cursor: not-allowed; }
+
+        .status { text-align: center; color: var(--text2); font-size: 0.85rem; min-height: 1.2em; margin-bottom: 1rem; }
+
+        /* Spinner */
+        .spinner {
+            display: none;
+            width: 32px; height: 32px;
+            border: 3px solid rgba(255,255,255,0.08);
+            border-left-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 1.5rem auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Results Grid */
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.25rem;
+        }
+
+        /* Base Card */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeUp 0.35s ease forwards;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .card:hover { transform: translateY(-2px); border-color: var(--accent); }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Image Card */
+        .card-img-wrap {
+            height: 200px;
+            overflow: hidden;
+            background: #0b1120;
+        }
+        .card-img-wrap img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.25s;
+        }
+        .card:hover .card-img-wrap img { transform: scale(1.03); }
+
+        /* Document Card */
+        .card-doc {
+            padding: 1rem 1.1rem;
+        }
+        .card-doc-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.6rem;
+        }
+        .doc-icon {
+            width: 36px; height: 36px;
+            border-radius: 0.4rem;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.65rem;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+        .doc-icon.pdf  { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .doc-icon.word { background: rgba(59,130,246,0.15); color: #3b82f6; }
+        .doc-icon.ppt  { background: rgba(249,115,22,0.15); color: #f97316; }
+        .doc-icon.txt  { background: rgba(148,163,184,0.15); color: #94a3b8;  }
+
+        .doc-filename {
+            font-size: 0.85rem;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+        .doc-snippet {
+            color: var(--text2);
+            font-size: 0.8rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Footer bar for both card types */
+        .card-footer {
+            padding: 0.6rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            gap: 0.5rem;
+        }
+        .card-footer .fname {
+            font-size: 0.75rem;
+            color: var(--text2);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+
+        /* Badge */
+        .badge {
+            font-weight: 600; font-size: 0.75rem;
+            padding: 0.15rem 0.55rem;
+            border-radius: 999px;
+            white-space: nowrap; flex-shrink: 0;
+        }
+        .badge-high { color: #10b981; background: rgba(16,185,129,0.15); }
+        .badge-mid  { color: #f59e0b; background: rgba(245,158,11,0.15); }
+        .badge-low  { color: #94a3b8; background: rgba(148,163,184,0.12); }
+
+        .no-results {
+            text-align: center; color: var(--text2);
+            font-size: 1rem; margin-top: 2.5rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Memory Search</h1>
+        <p class="subtitle">Search images and documents with natural language</p>
+    </header>
+
+    <div class="search-bar">
+        <input id="q" type="text" placeholder="E.g., snowy mountain, invoice total, project report..." autocomplete="off">
+        <button id="btn">Search</button>
+    </div>
+
+    <div id="status" class="status"></div>
+    <div id="spinner" class="spinner"></div>
+    <div id="noRes" class="no-results">No matching results found.</div>
+    <div id="grid" class="results"></div>
+</div>
+
+<script>
+const q = document.getElementById('q');
+const btn = document.getElementById('btn');
+const grid = document.getElementById('grid');
+const spinner = document.getElementById('spinner');
+const noRes = document.getElementById('noRes');
+const status = document.getElementById('status');
+
+q.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+btn.addEventListener('click', doSearch);
+
+async function doSearch() {
+    const query = q.value.trim();
+    if (!query) return;
+
+    grid.innerHTML = '';
+    noRes.style.display = 'none';
+    spinner.style.display = 'block';
+    btn.disabled = true;
+    status.textContent = 'Searching images and documents...';
+    status.style.color = '';
+
+    try {
+        const res = await fetch('/api/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query })
+        });
+        if (!res.ok) throw new Error('Server error ' + res.status);
+        const data = await res.json();
+
+        spinner.style.display = 'none';
+
+        if (!data.results || data.results.length === 0) {
+            noRes.style.display = 'block';
+            status.textContent = 'No matches found.';
+            return;
+        }
+
+        const imgCount = data.results.filter(r => r.type === 'image').length;
+        const docCount = data.results.filter(r => r.type === 'document').length;
+        status.textContent = `Found ${data.results.length} result${data.results.length > 1 ? 's' : ''} (${imgCount} image${imgCount !== 1 ? 's' : ''}, ${docCount} document${docCount !== 1 ? 's' : ''})`;
+
+        data.results.forEach((r, idx) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.animationDelay = `${idx * 0.06}s`;
+
+            const pct = r.percentage.toFixed(1);
+            let badgeCls = 'badge-low';
+            if (r.percentage >= 60) badgeCls = 'badge-high';
+            else if (r.percentage >= 30) badgeCls = 'badge-mid';
+
+            const fname = r.path.split('\\').pop().split('/').pop();
+
+            if (r.type === 'image') {
+                card.innerHTML = `
+                    <div class="card-img-wrap">
+                        <img src="/image?path=${encodeURIComponent(r.path)}" alt="${fname}" loading="lazy"
+                             onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\"color:#475569;font-size:.8rem;padding:1rem;display:block;text-align:center\">Image failed to load</span>';">
+                    </div>
+                    <div class="card-footer">
+                        <span class="fname" title="${fname}">${fname}</span>
+                        <span class="badge ${badgeCls}">${pct}%</span>
+                    </div>`;
+            } else {
+                // Document card
+                const ft = r.file_type || 'txt';
+                const snippet = (r.chunk_text || '').substring(0, 250);
+                const iconLabel = ft === 'word' ? 'DOC' : ft.toUpperCase();
+
+                card.innerHTML = `
+                    <div class="card-doc">
+                        <div class="card-doc-header">
+                            <div class="doc-icon ${ft}">${iconLabel}</div>
+                            <div class="doc-filename" title="${fname}">${fname}</div>
+                        </div>
+                        <div class="doc-snippet">${snippet}${snippet.length >= 250 ? '...' : ''}</div>
+                    </div>
+                    <div class="card-footer">
+                        <a class="fname" href="/file?path=${encodeURIComponent(r.path)}" target="_blank" title="Open file" style="color:var(--accent);text-decoration:none;">Open file ↗</a>
+                        <span class="badge ${badgeCls}">${pct}%</span>
+                    </div>`;
+            }
+            grid.appendChild(card);
+        });
+
+    } catch (err) {
+        console.error(err);
+        spinner.style.display = 'none';
+        status.textContent = 'Error: ' + err.message;
+        status.style.color = '#ef4444';
+    } finally {
+        btn.disabled = false;
+    }
+}
+</script>
+</body>
+</html>

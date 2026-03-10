@@ -1,0 +1,36 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyInstaller / Build artifacts
+build/
+dist/
+*.egg-info/
+*.spec
+desktop_app.build/
+desktop_app.dist/
+
+# Database / Vector store
+chroma_data/
+
+# Logs and debug files
+*.log
+debug_output.txt
+debug_result.txt
+logs.txt
+nuitka-crash-report.xml
+
+# IDE / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Virtual environments
+venv/
+env/
+.env
+
+# Crash reports and temp files
+archive/
