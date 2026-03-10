@@ -1,4 +1,4 @@
-<h1 align="center">Personal Memory Assistant</h1>
+<img width="1121" height="681" alt="image" src="https://github.com/user-attachments/assets/b1721555-2839-4a70-83dd-ab600537cdd2" /><h1 align="center">Personal Memory Assistant</h1>
 
 <p align="center">
   <strong>An AI-powered, offline-first desktop application that acts as an intelligent, semantic search engine for your local images and documents.</strong>
@@ -18,15 +18,18 @@
 
 > **Home Screen**
 > <br/>
-> `![Home Screen](link-to-screenshot.jpg)`
+> <img width="1121" height="682" alt="Screenshot 2026-03-10 130331" src="https://github.com/user-attachments/assets/cadc8359-d4d6-4032-919b-e44e1c33291a" />
+
 
 > **Image Search Results**
 > <br/>
-> `![Image Search](link-to-screenshot.jpg)`
+> <img width="1121" height="681" alt="image" src="https://github.com/user-attachments/assets/b9301956-d3dc-45ed-a3aa-e01553ec0fdc" />
+
 
 > **Document Search Results**
 > <br/>
-> `![Document Search](link-to-screenshot.jpg)`
+> <img width="1121" height="682" alt="Screenshot 2026-03-10 130443" src="https://github.com/user-attachments/assets/f5ece949-b200-4952-b72e-e8ae9b7c82ce" />
+
 
 ## 🛠️ Technologies Used
 
