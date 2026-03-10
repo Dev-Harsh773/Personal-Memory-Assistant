@@ -1,4 +1,4 @@
-<img width="1121" height="681" alt="image" src="https://github.com/user-attachments/assets/b1721555-2839-4a70-83dd-ab600537cdd2" /><h1 align="center">Personal Memory Assistant</h1>
+
 
 <p align="center">
   <strong>An AI-powered, offline-first desktop application that acts as an intelligent, semantic search engine for your local images and documents.</strong>
@@ -14,7 +14,6 @@
 
 ## 📸 Screenshots
 
-*(Add your screenshots here!)*
 
 > **Home Screen**
 > <br/>
